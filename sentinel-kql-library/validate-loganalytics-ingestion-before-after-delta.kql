@@ -1,0 +1,25 @@
+let ChangeTime = datetime(2026-05-21 12:00:00);
+let MaxWindow = 7d;
+let ActualWindow = iff(now() - ChangeTime > MaxWindow, MaxWindow, now() - ChangeTime);
+let BeforeStart = ChangeTime - ActualWindow;
+let AfterEnd = ChangeTime + ActualWindow;
+Usage
+| where TimeGenerated between (BeforeStart .. AfterEnd)
+| where IsBillable == true
+| extend Period = iff(TimeGenerated < ChangeTime, "Before", "After")
+| summarize MB = sum(Quantity) by DataType, Period
+| summarize
+    BeforeGB = sumif(MB, Period == "Before") / 1024.0,
+    AfterGB  = sumif(MB, Period == "After") / 1024.0
+  by DataType
+| extend
+    DeltaGB = AfterGB - BeforeGB,
+    DeltaPct = iff(BeforeGB == 0.0, real(null), ((AfterGB - BeforeGB) / BeforeGB) * 100.0)
+| where DeltaGB > 0.01
+| project
+    DataType,
+    BeforeGB = round(BeforeGB, 3),
+    AfterGB = round(AfterGB, 3),
+    DeltaGB = round(DeltaGB, 3),
+    DeltaPct = round(DeltaPct, 1)
+| order by DeltaGB desc
