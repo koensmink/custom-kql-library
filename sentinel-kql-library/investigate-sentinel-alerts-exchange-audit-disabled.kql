@@ -1,0 +1,4 @@
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| where AlertName == "Exchange Audit Log Disabled"
+| summarize Alerts=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by AlertName, ProviderName, ProductName
