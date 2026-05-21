@@ -1,0 +1,13 @@
+DeviceEvents
+| where ActionType startswith "Asr"
+| where ActionType contains "Audited"
+| project Timestamp,
+          DeviceName,
+          InitiatingProcessFileName,
+          InitiatingProcessCommandLine,
+          FileName,
+          FolderPath,
+          ActionType,
+          AccountName,
+          ReportId
+| order by Timestamp desc
