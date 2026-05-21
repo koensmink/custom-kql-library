@@ -1,0 +1,7 @@
+DeviceEvents
+| where ActionType contains "Asr"
+| summarize Hits=count()
+          by InitiatingProcessFileName,
+             FolderPath,
+             SHA256
+| order by Hits desc
