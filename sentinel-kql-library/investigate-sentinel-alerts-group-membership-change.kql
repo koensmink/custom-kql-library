@@ -1,0 +1,5 @@
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| where AlertName has "Group created then added"
+| summarize Alerts=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by AlertName, ProviderName, ProductName
+| order by Alerts desc
