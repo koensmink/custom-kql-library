@@ -1,0 +1,5 @@
+Usage
+| where TimeGenerated > ago(14d)
+| where IsBillable == true
+| summarize GB = round(sum(Quantity) / 1024.0, 3) by bin(TimeGenerated, 1d), DataType
+| order by TimeGenerated asc, GB desc
