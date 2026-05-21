@@ -1,0 +1,5 @@
+SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Title has "Group created then added"
+| summarize Incidents=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by Title, Severity, Status
+| order by Incidents desc
