@@ -1,0 +1,16 @@
+DeviceEvents
+| where ActionType startswith "Asr"
+| extend RuleName = case(
+    ActionType == "AsrLsassCredentialTheftAudited", "Block credential stealing from LSASS",
+    ActionType == "AsrOfficeChildProcessAudited", "Block Office child processes",
+    ActionType == "AsrPsexecWmiChildProcessAudited", "Block PSExec/WMI child processes",
+    ActionType == "AsrOfficeExecutableContentAudited", "Block Office executable content",
+    ActionType == "AsrOfficeProcessInjectionAudited", "Block Office code injection",
+    ActionType == "AsrExecutableEmailContentAudited", "Block executable content from email/webmail",
+    ActionType == "AsrObfuscatedScriptAudited", "Block obfuscated scripts",
+    ActionType == "AsrScriptExecutableDownloadAudited", "Block JS/VBS downloaded executables",
+    ActionType
+)
+| summarize Hits=count()
+          by RuleName, ActionType
+| order by Hits desc
