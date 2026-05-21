@@ -1,0 +1,6 @@
+DeviceEvents
+| where ActionType startswith "Asr"
+| summarize Hits=count()
+          by ActionType,
+             InitiatingProcessFileName
+| order by Hits desc
