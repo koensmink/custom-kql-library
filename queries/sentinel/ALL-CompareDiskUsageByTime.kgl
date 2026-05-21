@@ -1,0 +1,13 @@
+# Vergelijk laatste 24 uur met de 24 uur daarvoor
+Usage
+| where TimeGenerated > ago(48h)
+| where IsBillable == true
+| extend Period = iff(TimeGenerated > ago(24h), "Last24h", "Previous24h")
+| summarize GB = sum(Quantity) / 1024 by Period, DataType
+| evaluate pivot(Period, sum(GB), DataType)
+| extend 
+    Previous24h = coalesce(Previous24h, 0.0),
+    Last24h = coalesce(Last24h, 0.0),
+    DeltaGB = round(Last24h - Previous24h, 2),
+    DeltaPct = iff(Previous24h == 0, real(null), round(((Last24h - Previous24h) / Previous24h) * 100, 1))
+| order by DeltaGB desc
