@@ -1,3 +1,4 @@
+# dagelijkse trend per datatype
 Usage
 | where TimeGenerated > ago(14d)
 | where IsBillable == true
