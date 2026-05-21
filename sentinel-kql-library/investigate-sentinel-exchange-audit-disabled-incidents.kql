@@ -1,0 +1,4 @@
+SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Title has "Exchange Audit Log Disabled"
+| summarize Incidents=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by Title, Severity, Status
