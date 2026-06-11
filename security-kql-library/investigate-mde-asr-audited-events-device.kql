@@ -1,0 +1,17 @@
+let Asset = "DEVICE01";
+DeviceEvents
+| where Timestamp >= ago(30d)
+| where DeviceName =~ Asset
+| where ActionType startswith "Asr"
+| where ActionType endswith "Audited"
+| project
+    Timestamp,
+    DeviceName,
+    ActionType,
+    FileName,
+    FolderPath,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine,
+    InitiatingProcessParentFileName,
+    ReportId
+| order by Timestamp desc
