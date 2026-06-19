@@ -1,0 +1,15 @@
+DeviceEvents
+| where ActionType == "AsrExecutableEmailContentBlocked"
+| where FolderPath contains @"\AppData\Local\assembly\"
+| project Timestamp,
+          DeviceName,
+          FileName,
+          FolderPath,
+          SHA1,
+          SHA256,
+          InitiatingProcessFileName,
+          InitiatingProcessVersionInfoCompanyName,
+          InitiatingProcessVersionInfoProductName,
+          InitiatingProcessVersionInfoOriginalFileName,
+          AdditionalFields
+| order by Timestamp desc
