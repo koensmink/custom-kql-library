@@ -1,0 +1,1 @@
+DeviceEvents | where FolderPath contains @"\AppData\Local\assembly\" | project Timestamp, ActionType, FileName, FolderPath, SHA1, SHA256 | order by Timestamp desc
