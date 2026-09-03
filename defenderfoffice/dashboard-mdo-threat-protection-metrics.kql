@@ -1,0 +1,147 @@
+union
+(
+    EmailAttachmentInfo
+    | where DetectionMethods has "File detonation"
+        or DetectionMethods has "File detonation reputation"
+    | distinct NetworkMessageId, RecipientEmailAddress
+    | summarize Value=count()
+    | extend MetricId="MDO-001", Metric="Safe Attachments malicious recipient-messages"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "URL detonation"
+    | summarize Value=count()
+    | extend MetricId="MDO-002", Metric="Safe Links URL detonation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "URL detonation reputation"
+    | summarize Value=count()
+    | extend MetricId="MDO-003", Metric="Safe Links URL detonation reputation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "URL malicious reputation"
+    | summarize Value=count()
+    | extend MetricId="MDO-004", Metric="Malicious URL reputation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Impersonation brand"
+    | summarize Value=count()
+    | extend MetricId="MDO-005", Metric="Brand impersonation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Impersonation user"
+    | summarize Value=count()
+    | extend MetricId="MDO-006", Metric="Protected-user impersonation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Impersonation domain"
+    | summarize Value=count()
+    | extend MetricId="MDO-007", Metric="Protected-domain impersonation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Mailbox intelligence impersonation"
+    | summarize Value=count()
+    | extend MetricId="MDO-008", Metric="Mailbox intelligence impersonation detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Fingerprint matching"
+    | summarize Value=count()
+    | extend MetricId="MDO-009", Metric="Fingerprint matching detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Advanced filter"
+    | summarize Value=count()
+    | extend MetricId="MDO-010", Metric="Advanced filter detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "LLM content analysis"
+    | summarize Value=count()
+    | extend MetricId="MDO-011", Metric="LLM content analysis detections"
+),
+(
+    EmailEvents
+    | extend DM=parse_json(DetectionMethods)
+    | mv-expand ThreatClass=bag_keys(DM)
+    | extend Methods=DM[tostring(ThreatClass)]
+    | mv-expand DetectionMethod=Methods
+    | where tostring(DetectionMethod) == "Mail bombing"
+    | summarize Value=count()
+    | extend MetricId="MDO-012", Metric="Mail bombing detections"
+),
+(
+    UrlClickEvents
+    | where isnotempty(ThreatTypes)
+    | where ActionType != "ClickAllowed"
+    | summarize Value=count()
+    | extend MetricId="MDO-013", Metric="Malicious Safe Links clicks blocked"
+),
+(
+    MessagePostDeliveryEvents
+    | where ActionType == "Phish ZAP"
+    | summarize Value=count()
+    | extend MetricId="MDO-014", Metric="Teams phishing messages remediated by ZAP"
+),
+(
+    MessagePostDeliveryEvents
+    | where ActionType == "Malware ZAP"
+    | summarize Value=count()
+    | extend MetricId="MDO-015", Metric="Teams malware messages remediated by ZAP"
+),
+(
+    CampaignInfo
+    | where CampaignType in ("Phish", "Malware")
+    | distinct CampaignId
+    | summarize Value=count()
+    | extend MetricId="MDO-016", Metric="Unique phishing/malware campaigns identified"
+)
+| project MetricId, Metric, Value
+| order by MetricId asc
